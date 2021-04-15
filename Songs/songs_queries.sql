@@ -22,25 +22,19 @@ from singer_prod s
 group by s.tragoudistis;
 
 -- 5th query
-select distinct s.title
-from singer_prod s, cd_production c
-where c.code_cd = s.cd
-union
-select distinct g.title
-from group_prod g, cd_production c
-where c.code_cd = g.cd;
+select t.titlos
+from singer_prod s, tragoudi t, group_prod g
+where s.title = t.titlos and g.title = s.title;
 
 -- 6th query
 select k.onoma, k.epitheto
-from kalitexnis k
-where k.ar_taut in (
-	select t.sinthetis
-	from tragoudi t
-	where t.titlos in (
-		select s.title
-		from singer_prod s
-		group by s.title
-		having count(distinct s.tragoudistis=1)));
+from kalitexnis k, singer_prod s, tragoudi t
+where s.title = t.titlos and t.sinthetis = k.ar_taut and s.title not in (
+	select group_prod.title
+    from group_prod)
+group by k.onoma, k.epitheto
+having count(distinct s.tragoudistis) = 1;
+
 
 -- 7th query
 select g.title
