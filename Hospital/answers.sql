@@ -1,5 +1,5 @@
 # 1
-select p.Name, sum(t.Cost)
+select p.SSN, p.Name, count(*) as totalStays, sum(t.Cost) as totalCost
 from undergoes u, treatment t, patient p
 where u.Treatment = t.Code and u.patient = p.SSN and u.Patient in (
 	select p.SSN
@@ -11,7 +11,7 @@ where u.Treatment = t.Code and u.patient = p.SSN and u.Patient in (
 group by p.SSN;
 
 # 2
-select n.Name, n.EmployeeID
+select n.EmployeeID, n.Name
 from nurse n
 where n.EmployeeID in (
 	select o.Nurse
@@ -22,9 +22,9 @@ where n.EmployeeID in (
 );
 
 # 3
-select p.Name
+select p.SSN, p.Name
 from patient p, vaccination v
-where p.SSN = v.patient_SSN and p.Gender = 'female' and p.Age >= 40
+where p.SSN = v.patient_SSN and p.Gender = 'female' and p.Age > 40
 group by p.SSN
 having count(*) in (
 	select u.num_of_doses
@@ -40,7 +40,7 @@ group by p.Medication
 having count(*) > 1;
 
 # 5
-select p.Name
+select p.SSN as patient_SSN
 from patient p
 where SSN in (
 	select v.patient_SSN
@@ -53,7 +53,7 @@ where SSN in (
 );
 
 # 6
-select 'yes' as Answer
+select 'yes' as answer
 from room r
 where not exists (
 	select *
@@ -70,19 +70,18 @@ where not exists (
 );
 
 # 7
-select p.Name, count(*) as Patients
+select p.EmployeeID, p.Name, count(*) as numOfpatient
 from physician p, undergoes u
 where p.Position = 'PATHOLOGY' and p.EmployeeID = u.Physician
-group by p.Name
+group by p.EmployeeID, p.Name
 union
-select p.Name, 0 as Patients
+select p.EmployeeID, p.Name, 0 as numOfpatient
 from physician p
 where p.Position = 'PATHOLOGY' and not exists (
 	select *
     from undergoes u
     where u.Physician = p.EmployeeID
-)
-group by p.Name;
+);
 
 # 8
 select p.Name
@@ -101,7 +100,7 @@ where not exists (
 group by p.SSN;
 
 # 9
-select vaccines_vax_name, count(*) as Num
+select vaccines_vax_name
 from vaccination
 group by vaccines_vax_name
 having count(*) = (
